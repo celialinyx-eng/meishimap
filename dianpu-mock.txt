@@ -1,0 +1,101 @@
+[
+  {
+    "name": "烤匠麻辣烤鱼（上海首店）",
+    "location": {
+      "longitude": 121.5134,
+      "latitude": 31.3005
+    },
+    "avg_price": 115,
+    "rating": 4.8,
+    "comment_count": 12405,
+    "area": "五角场合生汇"
+  },
+  {
+    "name": "浩海火烧云傣家菜（合生汇店）",
+    "location": {
+      "longitude": 121.5142,
+      "latitude": 31.3012
+    },
+    "avg_price": 108,
+    "rating": 4.7,
+    "comment_count": 8920,
+    "area": "五角场合生汇"
+  },
+  {
+    "name": "潇湘阁（五角场合生汇店）",
+    "location": {
+      "longitude": 121.5138,
+      "latitude": 31.3008
+    },
+    "avg_price": 85,
+    "rating": 4.6,
+    "comment_count": 15600,
+    "area": "五角场合生汇"
+  },
+  {
+    "name": "帕蓝·暹罗料理（大学路店）",
+    "location": {
+      "longitude": 121.5095,
+      "latitude": 31.3038
+    },
+    "avg_price": 130,
+    "rating": 4.7,
+    "comment_count": 6210,
+    "area": "大学路"
+  },
+  {
+    "name": "夏朵餐厅（复旦店）",
+    "location": {
+      "longitude": 121.5072,
+      "latitude": 31.3045
+    },
+    "avg_price": 155,
+    "rating": 4.5,
+    "comment_count": 9800,
+    "area": "复旦/大学路"
+  },
+  {
+    "name": "金匠寿司（五角场合生汇店）",
+    "location": {
+      "longitude": 121.5145,
+      "latitude": 31.3002
+    },
+    "avg_price": 180,
+    "rating": 4.6,
+    "comment_count": 4350,
+    "area": "五角场合生汇"
+  },
+  {
+    "name": "很久以前羊肉串（五角场万达店）",
+    "location": {
+      "longitude": 121.5120,
+      "latitude": 31.3025
+    },
+    "avg_price": 140,
+    "rating": 4.8,
+    "comment_count": 21000,
+    "area": "五角场万达"
+  },
+  {
+    "name": "刘栋梁大排档（大学路店）",
+    "location": {
+      "longitude": 121.5105,
+      "latitude": 31.3032
+    },
+    "avg_price": 95,
+    "rating": 4.4,
+    "comment_count": 5120,
+    "area": "大学路"
+  },
+  {
+    "name": "Tapa Tapa（大学路店）",
+    "location": {
+      "longitude": 121.5088,
+      "latitude": 31.3040
+    },
+    "avg_price": 168,
+    "rating": 4.5,
+    "comment_count": 3450,
+    "area": "大学路"
+  }
+]

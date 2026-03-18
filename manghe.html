@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>一键治纠结 - 活力橙美食揭秘</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --brand-orange: #ff7a00; }
+
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-15px) rotate(10deg); }
+        }
+        .bg-deco { animation: float-slow 5s ease-in-out infinite; opacity: 0.15; position: absolute; pointer-events: none; }
+
+        @keyframes cloche-shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-2deg); }
+            75% { transform: translateX(5px) rotate(2deg); }
+            100% { transform: translateX(0); }
+        }
+        .shake-active { animation: cloche-shake 0.1s infinite; }
+
+        @keyframes lift-up {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-150px) scale(1.1); opacity: 0; }
+        }
+        .lift-anim { animation: lift-up 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+        @keyframes card-pop {
+            0% { transform: scale(0.8) translateY(50px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .card-show { animation: card-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        /* 盖菜盘样式 */
+        .cloche-lid {
+            width: 200px; height: 100px;
+            background: linear-gradient(145deg, #e6e6e6, #ffffff);
+            border-radius: 100px 100px 0 0;
+            position: relative;
+            border-bottom: 4px solid #d1d1d1;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .cloche-handle {
+            width: 30px; height: 15px;
+            background: #d1d1d1;
+            border-radius: 15px 15px 0 0;
+            position: absolute; top: -15px; left: 50%;
+            transform: translateX(-50%);
+        }
+        .cloche-plate {
+            width: 240px; height: 12px;
+            background: #f3f3f3;
+            border-radius: 50px; margin-top: 2px;
+            border-bottom: 4px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body class="bg-[#fffcf9] min-h-screen flex flex-col items-center justify-center overflow-hidden font-sans relative">
+
+    <div class="bg-deco text-7xl top-20 left-10">🍊</div>
+    <div class="bg-deco text-7xl bottom-20 right-10" style="animation-delay: 1.5s;">🥢</div>
+
+    <header class="fixed top-0 w-full p-6 z-50">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <button onclick="window.location.href='./meishi-map.html'" class="bg-white/80 backdrop-blur px-6 py-2.5 rounded-full shadow-sm border border-orange-100 text-orange-600 font-bold hover:bg-orange-50 transition-all">
+                ← 返回首页
+            </button>
+            <div class="bg-orange-100 text-orange-600 px-4 py-1 rounded-full text-xs font-black tracking-widest uppercase">Campus Walk</div>
+        </div>
+    </header>
+
+    <main class="text-center z-10">
+        <div id="text-guide" class="mb-16">
+            <h2 class="text-4xl font-black text-slate-800">惊喜餐盘</h2>
+            <p class="text-orange-500 mt-2 font-bold">揭开盖子，解锁你的今日美味</p>
+        </div>
+
+        <div id="cloche-container" onclick="startReveal()" class="relative flex flex-col items-center cursor-pointer group">
+            <div id="cloche-lid-part" class="relative z-20 transition-transform duration-300 group-hover:-translate-y-2">
+                <div class="cloche-handle"></div>
+                <div class="cloche-lid"></div>
+            </div>
+            <div class="cloche-plate z-10"></div>
+            
+            <div id="tap-msg" class="mt-8 bg-orange-50 text-orange-600 px-8 py-2 rounded-full font-black tracking-widest text-sm shadow-sm border border-orange-100">
+                点击揭秘
+            </div>
+        </div>
+    </main>
+
+    <div id="modal-overlay" class="fixed inset-0 z-[60] flex items-center justify-center bg-orange-900/30 backdrop-blur-sm hidden p-4">
+        <div id="result-card" class="bg-white w-full max-w-sm rounded-[2rem] overflow-hidden shadow-2xl border border-orange-50">
+            
+            <div class="h-52 bg-slate-200 relative">
+                <img id="res-img" src="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                <div class="absolute bottom-4 left-6 text-white font-black text-sm">杨浦推荐</div>
+            </div>
+
+            <div class="p-8 text-left">
+                <div class="flex justify-between items-end mb-1">
+                    <h3 id="res-name" class="text-2xl font-black text-slate-800 tracking-tight">加载中...</h3>
+                    <span id="res-price" class="text-orange-600 font-black text-xl">￥0</span>
+                </div>
+                <p id="res-area" class="text-slate-500 text-xs mb-6 font-bold">📍 地址加载中...</p>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <button class="py-3.5 bg-slate-100 text-slate-500 font-black rounded-xl text-sm">查看详情</button>
+                    <button class="py-3.5 bg-[#ff7a00] text-white font-black rounded-xl text-sm shadow-md shadow-orange-200">一键导航</button>
+                </div>
+
+                <button onclick="resetCloche()" class="w-full py-2 text-orange-600 text-sm font-black hover:underline transition-colors tracking-widest">
+                    — 换一个 —
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const shops = [
+            { name: "烤匠麻辣烤鱼", price: 115, area: "五角场合生汇", img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=500" },
+            { name: "浩海火烧云傣家菜", price: 108, area: "五角场合生汇", img: "https://images.unsplash.com/photo-1559847844-5315695dadae?w=500" },
+            { name: "帕蓝·暹罗料理", price: 130, area: "大学路", img: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=500" },
+            { name: "夏朵餐厅", price: 155, area: "大学路", img: "https://images.unsplash.com/photo-1550966842-28c46016f40b?w=500" },
+            { name: "很久以前羊肉串", price: 140, area: "五角场万达", img: "https://images.unsplash.com/photo-1532636875304-0c89119d9b4d?w=500" }
+        ];
+
+        let isRevealing = false;
+
+        function startReveal() {
+            if (isRevealing) return;
+            isRevealing = true;
+
+            const lid = document.getElementById('cloche-lid-part');
+            const msg = document.getElementById('tap-msg');
+
+            lid.classList.add('shake-active');
+            msg.innerText = "美味准备中...";
+
+            setTimeout(() => {
+                lid.classList.remove('shake-active');
+                lid.classList.add('lift-anim');
+                
+                setTimeout(() => {
+                    const shop = shops[Math.floor(Math.random() * shops.length)];
+                    document.getElementById('res-name').innerText = shop.name;
+                    document.getElementById('res-area').innerText = `📍 上海杨浦区 · ${shop.area}`;
+                    document.getElementById('res-price').innerText = `￥${shop.price}`;
+                    document.getElementById('res-img').src = shop.img;
+
+                    document.getElementById('modal-overlay').classList.remove('hidden');
+                    document.getElementById('result-card').classList.add('card-show');
+                    isRevealing = false;
+                }, 400);
+            }, 800);
+        }
+
+        function resetCloche() {
+            const overlay = document.getElementById('modal-overlay');
+            const card = document.getElementById('result-card');
+            const lid = document.getElementById('cloche-lid-part');
+            const msg = document.getElementById('tap-msg');
+
+            overlay.classList.add('hidden');
+            card.classList.remove('card-show');
+            lid.classList.remove('lift-anim');
+            msg.innerText = "点击揭秘";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大学城美食地图 - 杨浦版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .school-selector {
+            background: #ffffff;
+            border: 2px solid #ef4444; /* 醒目红，贴合上海高校气息 */
+            border-radius: 999px;
+            padding: 6px 20px;
+            font-weight: bold;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ef4444'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 36px;
+        }
+        .tab-active {
+            background-color: #fef2f2;
+            color: #ef4444;
+            border-right: 4px solid #ef4444;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 h-16 grid grid-cols-3 items-center">
+            <!-- 左：返回首页 -->
+            <div class="justify-self-start">
+                <a href="./meishi-map.html" class="text-sm font-black text-red-600 hover:text-red-700 transition-colors inline-flex items-center gap-1 px-3 py-2 rounded-full hover:bg-red-50">
+                    ← 返回首页
+                </a>
+            </div>
+
+            <!-- 中：仅显示美食榜单 -->
+            <div class="justify-self-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🏆</span>
+                    <span class="text-sm font-black text-gray-900 tracking-wide">美食榜单</span>
+                </div>
+            </div>
+
+            <!-- 右：学校筛选器 -->
+            <div class="justify-self-end flex items-center gap-3">
+                <span class="text-2xl">📍</span>
+                <select id="school-select" class="school-selector text-red-600 focus:ring-2 focus:ring-red-200" onchange="initRender()">
+                    <option value="sufe">上海财经大学</option>
+                    <option value="fudan">复旦大学</option>
+                    <option value="tongji">同济大学</option>
+                    <option value="sus">上海体育大学</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-4 flex gap-6">
+        <aside class="w-1/4 py-4" id="sidebar">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest px-4 mb-4">精选榜单</p>
+            <nav class="flex flex-col space-y-1">
+                <button onclick="changeTab('top', this)" class="tab-active w-full text-left py-4 px-6 transition-all hover:bg-gray-100">🏆 综合必吃榜</button>
+                <button onclick="changeTab('cheap', this)" class="w-full text-left py-4 px-6 text-gray-600 transition-all hover:bg-gray-100">💰 月底保命榜</button>
+                <button onclick="changeTab('study', this)" class="w-full text-left py-4 px-6 text-gray-600 transition-all hover:bg-gray-100">📚 期末续命榜</button>
+            </nav>
+        </aside>
+
+        <section class="w-3/4 py-4">
+            <div class="mb-6">
+                <h2 id="list-title" class="text-2xl font-black text-gray-900">上海财经大学 · 综合必吃榜</h2>
+                <p class="text-sm text-gray-500 mt-1">根据校友真实评价与消费频次实时更新</p>
+            </div>
+
+            <div id="card-container" class="space-y-4">
+                </div>
+        </section>
+    </main>
+
+    <script>
+        let currentTab = 'top';
+
+        const mockData = {
+            sufe: {
+                top: [
+                    { name: "武川路第一炸串", price: "25", tag: "财大传统", quote: "即使毕业了，也想回来再吃一口这口酱。" },
+                    { name: "大学路西餐吧", price: "88", tag: "约会首选", quote: "财大生的后花园，氛围感直接拉满。" },
+                    { name: "正宗新疆拌面", price: "22", tag: "碳水快乐", quote: "面条筋道，分量大到男篮学弟都吃得饱。" },
+                    { name: "港式烧腊店", price: "35", tag: "品质午餐", quote: "叉烧肥而不腻，财大人的饭堂替补。" },
+                    { name: "酸汤鱼火锅", price: "65", tag: "寝室聚餐", quote: "冬天围在一起吃鱼，是大学最温暖的回忆。" }
+                ],
+                cheap: [
+                    { name: "后门破店炒饭", price: "12", tag: "加饭不要钱", quote: "月底余额不足时的救命稻草。" },
+                    { name: "武东路山东煎饼", price: "8", tag: "早八必备", quote: "一个煎饼加俩蛋，撑到下午没问题。" },
+                    { name: "麻辣烫自助", price: "15", tag: "称重自由", quote: "菜品很多，15块钱能吃到撑。" },
+                    { name: "财大食堂平替档口", price: "10", tag: "极致性价比", quote: "比食堂还好吃的校门口小摊。" },
+                    { name: "手工肉夹馍", price: "9", tag: "解馋神器", quote: "肉超级多，饼皮酥到掉渣。" }
+                ],
+                study: [
+                    { name: "图书馆咖啡角", price: "20", tag: "续命水", quote: "期末周如果不喝这杯，书是真的看不进去。" },
+                    { name: "大学路静谧书廊", price: "45", tag: "有插座/静音", quote: "除了贵没毛病，效率比宿舍高10倍。" },
+                    { name: "深夜甜品屋", price: "30", tag: "多巴胺补给", quote: "考前焦虑？来口提拉米苏瞬间满血。" },
+                    { name: "24h便利店", price: "10", tag: "全天候支撑", quote: "通宵刷题时的唯一亮光，关东煮很暖。" },
+                    { name: "能量沙拉店", price: "38", tag: "轻食高效", quote: "吃完不困，最适合考前高强度复习。" }
+                ]
+            },
+            fudan: {
+                top: [
+                    { name: "旦苑必买点心", price: "15", tag: "复旦名片", quote: "复旦人的集体骄傲，外校学生都想蹭卡买。" },
+                    { name: "本帮红烧肉私厨", price: "55", tag: "上海味道", quote: "这就是最正宗的上海味道，浓油赤酱。" },
+                    { name: "南美烧烤屋", price: "90", tag: "肉食者天堂", quote: "在这里，你可以大口喝酒大口吃肉。" },
+                    { name: "复旦老牌拉面", price: "18", tag: "情怀满分", quote: "老板没变，味道没变，吃的是回忆。" },
+                    { name: "大学路精致日料", price: "120", tag: "高质面基", quote: "食材很新鲜，适合重要的社交场合。" }
+                ],
+                cheap: Array(5).fill({ name: "复旦周边平价食堂", price: "12", tag: "省钱王", quote: "复旦人的省钱秘籍都在这里。" }),
+                study: Array(5).fill({ name: "光华楼周边咖啡", price: "25", tag: "学霸标配", quote: "在这里坐着的，可能都是未来的大牛。" })
+            },
+            tongji: {
+                top: Array(5).fill({ name: "同济硬核建筑菜", price: "30", tag: "吃在同济", quote: "同济的食堂和周边，从来没让人失望过。" }),
+                cheap: Array(5).fill({ name: "赤峰路小吃街", price: "10", tag: "十年如一", quote: "同济学子的第二食堂，物价感人。" }),
+                study: Array(5).fill({ name: "设计大道工作室咖啡", price: "35", tag: "灵感来源", quote: "画图画累了，来这里瘫一会儿。" })
+            },
+            sus: {
+                top: Array(5).fill({ name: "体院能量餐", price: "45", tag: "高蛋白", quote: "练完来一份，肌肉长得快。" }),
+                cheap: Array(5).fill({ name: "大份量盖浇饭", price: "15", tag: "管饱", quote: "体院人的食量，只有这家店能Hold住。" }),
+                study: Array(5).fill({ name: "体院静谧吧", price: "20", tag: "放松时刻", quote: "难得的安静角落，适合思考人生。" })
+            }
+        };
+
+        function changeTab(tabKey, btn) {
+            currentTab = tabKey;
+            // 切换按钮样式
+            const buttons = document.querySelectorAll('#sidebar button');
+            buttons.forEach(b => b.classList.remove('tab-active', 'text-red-600', 'font-bold'));
+            buttons.forEach(b => b.classList.add('text-gray-600'));
+            
+            btn.classList.add('tab-active');
+            btn.classList.remove('text-gray-600');
+            
+            initRender();
+        }
+
+        function initRender() {
+            const schoolKey = document.getElementById('school-select').value;
+            const schoolName = document.getElementById('school-select').options[document.getElementById('school-select').selectedIndex].text;
+            const container = document.getElementById('card-container');
+            
+            // 更新标题
+            const tabNames = { top: '综合必吃榜', cheap: '月底保命榜', study: '期末续命榜' };
+            document.getElementById('list-title').innerText = `${schoolName} · ${tabNames[currentTab]}`;
+
+            // 获取对应学校对应榜单的数据（如果没写完则 fallback 到默认数据）
+            const data = (mockData[schoolKey] && mockData[schoolKey][currentTab]) || mockData['sufe']['top'];
+            
+            container.innerHTML = data.map((item, index) => `
+                <div class="group bg-white rounded-2xl p-6 flex gap-6 border border-gray-100 hover:border-red-200 hover:shadow-xl transition-all duration-300 cursor-pointer">
+                    <div class="flex-shrink-0 w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center font-black text-xl group-hover:bg-red-500 group-hover:text-white transition-colors">
+                        ${index + 1}
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-bold text-xl text-gray-800">${item.name}</h3>
+                                <div class="mt-1 flex gap-2">
+                                    <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">${item.tag}</span>
+                                    <span class="text-xs bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full italic"># 距离校门 500m</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-red-500 font-black text-lg text-red-600">￥${item.price}</span>
+                                <p class="text-[10px] text-gray-400 mt-1">均价/人</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 bg-gray-50 p-3 rounded-xl border-l-4 border-red-300">
+                            <p class="text-sm text-gray-600 leading-relaxed italic">“${item.quote}”</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 页面首次加载
+        window.onload = initRender;
+    </script>
+</body>
+</html>
